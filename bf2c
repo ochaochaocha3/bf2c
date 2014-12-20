@@ -1,0 +1,121 @@
+#!/usr/bin/env ruby
+
+require 'strscan'
+
+class Bf2C
+  HEADER = <<EOS
+#include <stdio.h>
+
+#define ARRAY_SIZE 32768
+
+unsigned char a[ARRAY_SIZE];
+size_t p;
+
+int main(void) {
+  size_t i;
+
+#define REPEAT(n) \\
+  for (i = 0; i < (n); i++)
+
+EOS
+
+  FOOTER = <<EOS
+
+  return 0;
+}
+EOS
+
+  CONVERT_TABLE = {
+    next_ptr: 'p++;',
+    prev_ptr: 'p--;',
+    inc_ptr: 'a[p]++;',
+    dec_ptr: 'a[p]--;',
+    putchar: 'putchar(a[p]);',
+    getchar: 'a[p] = getchar();',
+    loop_start: 'while (a[p] != 0) {',
+    loop_end: '}'
+  }
+
+  def initialize(source)
+    @tokens = []
+    parse(source)
+  end
+
+  def print(io)
+    return if @tokens.empty?
+
+    io.puts(HEADER)
+
+    indent_level = 1
+    last_token = nil
+    @tokens.each do |token, n|
+      io.puts if last_token == :loop_end && token != :loop_end
+
+      indent_level -= 1 if token == :loop_end
+      indent_level.times { io.print('  ') }
+
+      io.puts(n > 1 ?
+              "REPEAT(#{n}) { #{CONVERT_TABLE[token]} }" :
+              CONVERT_TABLE[token])
+
+      indent_level += 1 if token == :loop_start
+
+      last_token = token
+    end
+
+    io.puts(FOOTER)
+  end
+
+  def parse(source)
+    lines = source.lines
+    scanner = nil
+    push_token = ->sym { @tokens << [sym, scanner[0].length] }
+    pointer = 0
+    loop_level = 0
+
+    lines.each.with_index(1).each do |line, line_num|
+      scanner = StringScanner.new(line)
+
+      until scanner.eos?
+        case
+        when scanner.scan(/>+/)
+          push_token[:next_ptr]
+        when scanner.scan(/<+/)
+          push_token[:prev_ptr]
+        when scanner.scan(/\++/)
+          push_token[:inc_ptr]
+        when scanner.scan(/-+/)
+          push_token[:dec_ptr]
+        when scanner.scan(/\.+/)
+          push_token[:putchar]
+        when scanner.scan(/,+/)
+          push_token[:getchar]
+        when scanner.scan(/\[/)
+          loop_level += 1
+          @tokens << [:loop_start, 1]
+        when scanner.scan(/\]/)
+          loop_level -= 1
+          if loop_level < 0
+            raise "excess ']' (#{line_num}:#{scanner.pos + 1})"
+          end
+
+          @tokens << [:loop_end, 1]
+        else
+          scanner.getch
+        end
+      end
+    end
+
+    raise "lacks ']'" if loop_level > 0
+  end
+  private :parse
+end
+
+if $PROGRAM_NAME == __FILE__
+  begin
+    Bf2C.new(ARGF.read).print($stdout)
+  rescue => e
+    $stderr.puts(e)
+    abort
+  end
+end
