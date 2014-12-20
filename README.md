@@ -9,8 +9,7 @@ Ruby で書かれた、Brainfuck のソースをそれなりに読みやすい C
 例として、[Wikipedia に載っている Hello world](https://ja.wikipedia.org/wiki/Hello_world%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E3%81%AE%E4%B8%80%E8%A6%A7#Brainfuck)（`helloworld.bf`）を変換してみます。
 
 ```brainfuck
-# Brainfuck で「Hello, world!」と表示する
-# Wikipedia「Brainfuck」 (https://ja.wikipedia.org/wiki/Hello_world%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E3%81%AE%E4%B8%80%E8%A6%A7#Brainfuck) より
+# Hello world
 
 +++++++++[>++++++++>+++++++++++>+++++<<<-]>.>++.+++++++..+++.>-.
 ------------.<++++++++.--------.+++.------.--------.>+.
