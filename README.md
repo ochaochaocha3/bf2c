@@ -39,6 +39,7 @@ int main(void) {
   for (i = 0; i < (n); i++)
 
   REPEAT(9) { a[p]++; }
+
   while (a[p] != 0) {
     p++;
     REPEAT(8) { a[p]++; }
