@@ -49,9 +49,15 @@ EOS
     indent_level = 1
     last_token = nil
     @tokens.each do |token, n|
-      io.puts if last_token == :loop_end && token != :loop_end
+      case token
+      when :loop_start
+        io.puts if last_token && last_token != :loop_start
+      when :loop_end
+        indent_level -= 1
+      else
+        io.puts if last_token == :loop_end
+      end
 
-      indent_level -= 1 if token == :loop_end
       indent_level.times { io.print('  ') }
 
       io.puts(n > 1 ?
