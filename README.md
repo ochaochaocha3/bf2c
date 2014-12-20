@@ -30,7 +30,7 @@ cd /path/to/bf2c
 #define ARRAY_SIZE 32768
 
 unsigned char a[ARRAY_SIZE];
-size_t p;
+unsigned char* ptr = a;
 
 int main(void) {
   size_t i;
@@ -38,47 +38,47 @@ int main(void) {
 #define REPEAT(n) \
   for (i = 0; i < (n); i++)
 
-  REPEAT(9) { a[p]++; }
+  *ptr += 9;
 
-  while (a[p] != 0) {
-    p++;
-    REPEAT(8) { a[p]++; }
-    p++;
-    REPEAT(11) { a[p]++; }
-    p++;
-    REPEAT(5) { a[p]++; }
-    REPEAT(3) { p--; }
-    a[p]--;
+  while (*ptr != 0) {
+    ptr++;
+    *ptr += 8;
+    ptr++;
+    *ptr += 11;
+    ptr++;
+    *ptr += 5;
+    ptr -= 3;
+    (*ptr)--;
   }
 
-  p++;
-  putchar(a[p]);
-  p++;
-  REPEAT(2) { a[p]++; }
-  putchar(a[p]);
-  REPEAT(7) { a[p]++; }
-  REPEAT(2) { putchar(a[p]); }
-  REPEAT(3) { a[p]++; }
-  putchar(a[p]);
-  p++;
-  a[p]--;
-  putchar(a[p]);
-  REPEAT(12) { a[p]--; }
-  putchar(a[p]);
-  p--;
-  REPEAT(8) { a[p]++; }
-  putchar(a[p]);
-  REPEAT(8) { a[p]--; }
-  putchar(a[p]);
-  REPEAT(3) { a[p]++; }
-  putchar(a[p]);
-  REPEAT(6) { a[p]--; }
-  putchar(a[p]);
-  REPEAT(8) { a[p]--; }
-  putchar(a[p]);
-  p++;
-  a[p]++;
-  putchar(a[p]);
+  ptr++;
+  putchar(*ptr);
+  ptr++;
+  *ptr += 2;
+  putchar(*ptr);
+  *ptr += 7;
+  REPEAT(2) { putchar(*ptr); }
+  *ptr += 3;
+  putchar(*ptr);
+  ptr++;
+  (*ptr)--;
+  putchar(*ptr);
+  *ptr -= 12;
+  putchar(*ptr);
+  ptr--;
+  *ptr += 8;
+  putchar(*ptr);
+  *ptr -= 8;
+  putchar(*ptr);
+  *ptr += 3;
+  putchar(*ptr);
+  *ptr -= 6;
+  putchar(*ptr);
+  *ptr -= 8;
+  putchar(*ptr);
+  ptr++;
+  (*ptr)++;
+  putchar(*ptr);
 
   return 0;
 }
